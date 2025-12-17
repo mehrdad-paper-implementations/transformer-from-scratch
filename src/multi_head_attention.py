@@ -26,6 +26,9 @@ class MultiHeadAttention(nn.Module):
     def forward(self, q, k, v, mask=None):
         """
         q_shape: [B, T, D]
+        k_shape: [B, T, D]
+        v_shape: [B, T, d_v]
+        mask_shape: [B, T] or [B, T, T]
         """
 
         # Get q, k and v by applying linear layer
@@ -44,7 +47,11 @@ class MultiHeadAttention(nn.Module):
         v = v.permute(0, 2, 1, 3)  # [B, H, T, d_v]
 
         # Broadcast mask with number of heads
-        mask = mask.unsqueeze(1).unsqueeze(2)  # [B, 1, 1, T]
+        if mask is not None:
+            if len(mask.shape) == 2:
+                mask = mask.unsqueeze(1).unsqueeze(2)  # [B, 1, 1, T]
+            elif len(mask.shape) == 3:
+                mask = mask.unsqueeze(1)
 
         # Apply scaled-dot-product-attention
         attentions = self.spda(q, k, v, mask)  # [B, H, T, d_v]
