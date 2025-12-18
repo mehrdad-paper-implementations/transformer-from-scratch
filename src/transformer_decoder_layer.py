@@ -11,6 +11,7 @@ class TransformerDecoderLayer(nn.Module):
 
         self.n_heads = n_heads
         self.d_model = d_model
+        self.d_ff = d_ff
 
         self.d_k = d_model // n_heads
         self.d_v = d_v if d_v is not None else self.d_k
