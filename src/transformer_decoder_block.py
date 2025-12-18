@@ -2,7 +2,7 @@
 Transformer Decoder Block
 """
 from torch import nn
-from transformer_decoder_layer import TransformerDecoderLayer
+from .transformer_decoder_layer import TransformerDecoderLayer
 
 
 class TransformerDecoderBlock(nn.Module):

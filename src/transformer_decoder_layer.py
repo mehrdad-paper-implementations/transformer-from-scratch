@@ -2,7 +2,7 @@
 Transformer Decoder Layer
 """
 from torch import nn
-from multi_head_attention import MultiHeadAttention
+from .multi_head_attention import MultiHeadAttention
 
 
 class TransformerDecoderLayer(nn.Module):

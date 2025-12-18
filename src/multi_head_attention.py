@@ -2,7 +2,7 @@
 Multi-head-attention class
 """
 from torch import nn
-from scaled_dot_product_attention import ScaledDotProductAttention
+from .scaled_dot_product_attention import ScaledDotProductAttention
 
 
 class MultiHeadAttention(nn.Module):
@@ -17,7 +17,7 @@ class MultiHeadAttention(nn.Module):
         # Get q, k and v by applying linear layer
         self.weights_q = nn.Linear(d_model, d_model, bias=False)
         self.weights_k = nn.Linear(d_model, d_model, bias=False)
-        self.weights_v = nn.Linear(d_model, d_v * self.n_heads, bias=False)
+        self.weights_v = nn.Linear(d_model, self.d_v * self.n_heads, bias=False)
 
         self.spda = ScaledDotProductAttention(self.d_k)
 

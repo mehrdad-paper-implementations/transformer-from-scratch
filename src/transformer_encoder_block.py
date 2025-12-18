@@ -2,7 +2,7 @@
 Transformer Encoder Block
 """
 from torch import nn
-from transformer_encoder_layer import TransformerEncoderLayer
+from .transformer_encoder_layer import TransformerEncoderLayer
 
 
 class TransformerEncoderBlock(nn.Module):

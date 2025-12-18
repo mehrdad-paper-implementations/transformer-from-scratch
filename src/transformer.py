@@ -1,9 +1,8 @@
 import math
-
 from torch import nn
-from transformer_encoder_block import TransformerEncoderBlock
-from transformer_decoder_block import TransformerDecoderBlock
-from positional_encoding import AbsolutePositionalEncoding
+from .transformer_encoder_block import TransformerEncoderBlock
+from .transformer_decoder_block import TransformerDecoderBlock
+from .positional_encoding import AbsolutePositionalEncoding
 
 
 class Transformer(nn.Module):
@@ -26,7 +25,8 @@ class Transformer(nn.Module):
         self.d_emb = d_emb if d_emb is not None else d_model
 
         if self.d_model != self.d_emb:
-            self.project_emb_to_d_model = nn.Linear(d_emb, d_model)
+            self.decoder_project_emb_to_d_model = nn.Linear(d_emb, d_model)
+            self.encoder_project_emb_to_d_model = nn.Linear(d_emb, d_model)
             self.project_d_model_to_emb = nn.Linear(d_model, d_emb)
 
         self.encoder_embedder = nn.Embedding(input_vocab_size, d_emb)
@@ -43,16 +43,20 @@ class Transformer(nn.Module):
         self.project_to_vocab_size.weight = self.decoder_embedder.weight
 
     def forward(self, input_ids, output_ids, causal_mask, input_mask=None, output_mask=None):
-        x_emb = self.encoder_embedder(input_ids) * math.sqrt(self.d_emb)
+        x_emb = self.encoder_embedder(input_ids) / math.sqrt(self.d_emb)
 
         if self.d_model != self.d_emb:
-            x_emb = self.project_emb_to_d_model(x_emb)
+            x_emb = self.encoder_project_emb_to_d_model(x_emb)
 
         x_emb = self.encoder_positional_encoding(x_emb)
 
         memory = self.encoder(x_emb, input_mask)
 
-        y_emb = self.decoder_embedder(output_ids) * math.sqrt(self.d_emb)
+        y_emb = self.decoder_embedder(output_ids) / math.sqrt(self.d_emb)
+
+        if self.d_model != self.d_emb:
+            y_emb = self.decoder_project_emb_to_d_model(y_emb)
+
         y_emb = self.decoder_positional_encoding(y_emb)
 
         output = self.decoder(y_emb, memory, causal_mask, output_mask)
