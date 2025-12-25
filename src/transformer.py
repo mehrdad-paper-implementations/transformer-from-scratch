@@ -42,7 +42,7 @@ class Transformer(nn.Module):
         # Share the decoder embedder weights with projection layer
         self.project_to_vocab_size.weight = self.decoder_embedder.weight
 
-    def forward(self, input_ids, output_ids, causal_mask, input_mask=None, output_mask=None):
+    def forward(self, input_ids, output_ids, causal_mask=None, input_mask=None, output_mask=None):
         x_emb = self.encoder_embedder(input_ids) / math.sqrt(self.d_emb)
 
         if self.d_model != self.d_emb:
@@ -59,7 +59,7 @@ class Transformer(nn.Module):
 
         y_emb = self.decoder_positional_encoding(y_emb)
 
-        output = self.decoder(y_emb, memory, causal_mask, output_mask)
+        output = self.decoder(y_emb, memory, input_mask, causal_mask, output_mask)
 
         if self.d_model != self.d_emb:
             output = self.project_d_model_to_emb(output)

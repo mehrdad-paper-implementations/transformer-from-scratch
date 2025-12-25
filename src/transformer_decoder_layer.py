@@ -30,7 +30,7 @@ class TransformerDecoderLayer(nn.Module):
             nn.ReLU(),
             nn.Linear(d_ff, d_model, bias=True))
 
-    def forward(self, x, encoder_output, padding_mask=None, causal_mask=None):
+    def forward(self, x, encoder_output, encoder_mask=None, padding_mask=None, causal_mask=None):
         """
         x_shape: [B, T, d_v]
         q_shape: [B, T, D]
@@ -38,7 +38,6 @@ class TransformerDecoderLayer(nn.Module):
         padding_mask: [B, T]
         causal_mask: [B, T, T]
         """
-
         mask = causal_mask
         if padding_mask is not None:
             mask = mask & padding_mask.unsqueeze(1)
@@ -50,7 +49,7 @@ class TransformerDecoderLayer(nn.Module):
         output = self.dropout(output)
         temp_output = self.self_attention_layer_norm(x + output)
 
-        output = self.multi_head_attention(q=temp_output, k=encoder_output, v=encoder_output, mask=padding_mask)
+        output = self.multi_head_attention(q=temp_output, k=encoder_output, v=encoder_output, mask=encoder_mask)
 
         # Add and norm
         output = self.dropout(output)

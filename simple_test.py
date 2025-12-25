@@ -28,7 +28,7 @@ def main(config: SimpleNamespace):
     y = torch.randint(low=0, high=100, size=(config.batch_size, 12))  # [B, T_dec]
 
     causal_mask = generate_causal_mask(y.size(1))
-    causal_mask = causal_mask.unsqueeze(0).expand(config.batch_size, -1, -1)  # [B, T, T]
+    causal_mask = causal_mask.unsqueeze(0).expand(y.size(0), -1, -1)  # [B, T, T]
 
     logits = model(input_ids=x,
                    output_ids=y,
